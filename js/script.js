@@ -411,35 +411,82 @@ function initContactForm() {
   const contactForm = document.getElementById('contactForm');
   if (!contactForm) return;
 
+  const nameInput = document.getElementById('contactName');
+  const emailInput = document.getElementById('contactEmail');
+  const subjectInput = document.getElementById('contactSubject');
+  const messageInput = document.getElementById('contactMessage');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitBtnText = document.getElementById('submitBtnText');
+  const formSuccessMessage = document.getElementById('formSuccessMessage');
+  const openGoogleFormLink = document.getElementById('openGoogleFormLink');
+
+  // Dynamic pre-fill link for Google Form if user chooses to open directly
+  if (openGoogleFormLink) {
+    const updatePrefillUrl = () => {
+      const name = nameInput ? encodeURIComponent(nameInput.value) : '';
+      const subject = subjectInput ? encodeURIComponent(subjectInput.value) : '';
+      let msg = messageInput ? messageInput.value : '';
+      if (emailInput && emailInput.value) {
+        msg += `\n\n(Sender Email: ${emailInput.value})`;
+      }
+      const encodedMsg = encodeURIComponent(msg);
+      openGoogleFormLink.href = `https://docs.google.com/forms/d/e/1FAIpQLSc6QfmukUpHIkMWMsF1f2Lqm4-B1-SEuxSagPFLDMG5ktS0Gg/viewform?usp=pp_url&entry.1104900571=${name}&entry.815616158=${subject}&entry.901967300=${encodedMsg}`;
+    };
+
+    [nameInput, emailInput, subjectInput, messageInput].forEach(input => {
+      if (input) input.addEventListener('input', updatePrefillUrl);
+    });
+  }
+
   contactForm.addEventListener('submit', (e) => {
     e.preventDefault();
-
-    const nameInput = document.getElementById('contactName');
-    const emailInput = document.getElementById('contactEmail');
-    const subjectInput = document.getElementById('contactSubject');
-    const messageInput = document.getElementById('contactMessage');
 
     const name = nameInput ? nameInput.value.trim() : '';
     const email = emailInput ? emailInput.value.trim() : '';
     const subject = subjectInput ? subjectInput.value.trim() : '';
-    const message = messageInput ? messageInput.value.trim() : '';
+    const rawMessage = messageInput ? messageInput.value.trim() : '';
 
-    if (!name || !email || !message) {
-      showToast('Please fill in all required fields.');
+    if (!name || !rawMessage) {
+      showToast('Please fill in your Name and Message.');
       return;
     }
 
-    // Friendly confirmation toast
-    showToast(`Thank you, ${name}! Preparing email client...`);
+    const fullMessage = email ? `${rawMessage}\n\n---\nSender Email: ${email}` : rawMessage;
 
-    // Construct mailto link as direct communication guarantee
-    const mailtoUri = `mailto:sachinsj100@gmail.com?subject=${encodeURIComponent(subject || 'Portfolio Inquiry from ' + name)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+    if (submitBtnText) submitBtnText.textContent = 'Submitting to Google Form...';
+    if (submitBtn) submitBtn.disabled = true;
 
-    setTimeout(() => {
-      window.location.href = mailtoUri;
+    // Google Forms submission endpoint
+    const googleFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSc6QfmukUpHIkMWMsF1f2Lqm4-B1-SEuxSagPFLDMG5ktS0Gg/formResponse';
+    const formData = new FormData();
+    formData.append('entry.1104900571', name);
+    formData.append('entry.815616158', subject);
+    formData.append('entry.901967300', fullMessage);
+
+    // Direct fetch with no-cors
+    fetch(googleFormUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: formData
+    }).then(() => {
+      handleSuccess(name);
+    }).catch(() => {
+      // Fallback submission via hidden iframe
+      if (messageInput) messageInput.value = fullMessage;
+      contactForm.submit();
+      handleSuccess(name);
+    });
+
+    function handleSuccess(senderName) {
+      showToast(`Thank you, ${senderName}! Your response was sent to Google Forms.`);
+      if (formSuccessMessage) {
+        formSuccessMessage.style.display = 'block';
+        setTimeout(() => { formSuccessMessage.style.display = 'none'; }, 8000);
+      }
       contactForm.reset();
-      showToast('Message client opened successfully!');
-    }, 800);
+      if (submitBtnText) submitBtnText.textContent = 'Send Message';
+      if (submitBtn) submitBtn.disabled = false;
+    }
   });
 }
 

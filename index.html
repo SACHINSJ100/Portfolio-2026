@@ -1078,38 +1078,55 @@
             </div>
           </div>
 
-          <!-- Right: Interactive Contact Form -->
+          <!-- Right: Interactive Contact Form connected to Google Forms -->
           <div class="contact-form-container">
-            <form id="contactForm">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+              <h3 style="font-size:1.15rem; font-weight:700; color:var(--text-primary);">Send a Message</h3>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSc6QfmukUpHIkMWMsF1f2Lqm4-B1-SEuxSagPFLDMG5ktS0Gg/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" id="openGoogleFormLink" style="font-size:0.84rem; color:var(--accent-cyan); font-weight:600; display:inline-flex; align-items:center; gap:5px;" title="Open in Google Forms">
+                Open in Google Forms
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </div>
+
+            <form id="contactForm" action="https://docs.google.com/forms/d/e/1FAIpQLSc6QfmukUpHIkMWMsF1f2Lqm4-B1-SEuxSagPFLDMG5ktS0Gg/formResponse" method="POST" target="hidden_iframe">
               <div class="form-row">
                 <div class="form-group">
                   <label for="contactName" class="form-label">Your Name *</label>
-                  <input type="text" id="contactName" class="form-input" placeholder="e.g. Sarah Connor" required>
+                  <input type="text" id="contactName" name="entry.1104900571" class="form-input" placeholder="e.g. Sarah Connor" required>
                 </div>
                 <div class="form-group">
-                  <label for="contactEmail" class="form-label">Your Email *</label>
+                  <label for="contactEmail" class="form-label">Your Email (for replies) *</label>
                   <input type="email" id="contactEmail" class="form-input" placeholder="name@company.com" required>
                 </div>
               </div>
 
               <div class="form-group">
                 <label for="contactSubject" class="form-label">Subject</label>
-                <input type="text" id="contactSubject" class="form-input" placeholder="Data Analyst Role / Analytics Project">
+                <input type="text" id="contactSubject" name="entry.815616158" class="form-input" placeholder="Data Analyst Role / Analytics Project">
               </div>
 
               <div class="form-group">
                 <label for="contactMessage" class="form-label">Message *</label>
-                <textarea id="contactMessage" class="form-textarea" placeholder="Tell me about your dataset, project requirements, or opportunity..." required></textarea>
+                <textarea id="contactMessage" name="entry.901967300" class="form-textarea" placeholder="Tell me about your dataset, project requirements, or opportunity..." required></textarea>
               </div>
 
-              <button type="submit" class="btn btn-primary" style="width: 100%;">
-                Send Message
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%;">
+                <span id="submitBtnText">Send Message</span>
+                <svg id="submitBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13"></line>
                   <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
               </button>
+
+              <div id="formSuccessMessage" style="display:none; margin-top:16px; padding:12px 16px; background:rgba(16,185,129,0.12); border:1px solid var(--accent-emerald); border-radius:var(--radius-md); color:var(--accent-emerald); font-size:0.9rem; font-weight:600; text-align:center;">
+                ✓ Thank you! Your message has been submitted to Google Forms.
+              </div>
             </form>
+            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
           </div>
         </div>
       </div>
